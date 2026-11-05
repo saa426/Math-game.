@@ -6222,7 +6222,9 @@ SUMMARY[10] = {
     Save.data.mode = App.mode;
     Save.write();
     var mbox = $('modes');
-    mbox.innerHTML = g.Boards.modes.map(function (m) { return '<button class="mode" data-mode="' + m.id + '" role="radio"><span class="mi">' + m.icon + '</span><b>' + m.name + '</b><small>' + m.desc + '</small></button>'; }).join('');
+    var availableModes = (g.Boards && Array.isArray(g.Boards.modes) ? g.Boards.modes : []).filter(function (m) { return m && m.id; });
+    if (!availableModes.length) availableModes = [{ id: 'adventure', icon: '🏃', name: 'المغامرة', desc: 'اركض واجمع الذهبيات' }];
+    mbox.innerHTML = availableModes.map(function (m) { return '<button class="mode" data-mode="' + m.id + '" role="radio"><span class="mi">' + (m.icon || '🎮') + '</span><b>' + (m.name || 'نمط اللعب') + '</b><small>' + (m.desc || '') + '</small></button>'; }).join('');
     function markModes() { $('.mode').forEach(function (b) { var on = b.getAttribute('data-mode') === App.mode; b.classList.toggle('sel', on); b.setAttribute('aria-checked', on); }); var n = $('lessons-mode'); if (n) { var m = g.Boards.modes.filter(function (x) { return x.id === App.mode; })[0]; n.textContent = m ? m.icon + ' ' + m.name : '🏃 المغامرة'; } }
     $$('.mode').forEach(function (b) { b.addEventListener('click', function () { App.mode = b.getAttribute('data-mode'); Save.data.mode = App.mode; Save.write(); A.resume(); A.sfx('click'); markModes(); }); });
     markModes(); App.markModes = markModes;
