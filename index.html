@@ -6217,11 +6217,13 @@ SUMMARY[10] = {
       inp.addEventListener('keydown', function (e) { e.stopPropagation(); if (e.key === 'Enter') inp.blur(); });
       inp.addEventListener('blur', function () { inp.value = cleanName(inp.value); Save.data.names[k] = inp.value; Save.write(); });
     });
-    App.mode = Save.data.mode && g.Boards.kinds[Save.data.mode] || 'adventure';
-    if (Save.data.mode === 'adventure') App.mode = 'adventure';
+    var savedMode = Save.data.mode;
+    App.mode = (savedMode === 'adventure' || (savedMode && g.Boards.kinds[savedMode])) ? savedMode : 'adventure';
+    Save.data.mode = App.mode;
+    Save.write();
     var mbox = $('modes');
     mbox.innerHTML = g.Boards.modes.map(function (m) { return '<button class="mode" data-mode="' + m.id + '" role="radio"><span class="mi">' + m.icon + '</span><b>' + m.name + '</b><small>' + m.desc + '</small></button>'; }).join('');
-    function markModes() { $$('.mode').forEach(function (b) { var on = b.getAttribute('data-mode') === App.mode; b.classList.toggle('sel', on); b.setAttribute('aria-checked', on); }); var n = $('lessons-mode'); if (n) { var m = g.Boards.modes.filter(function (x) { return x.id === App.mode; })[0]; n.textContent = m.icon + ' ' + m.name; } }
+    function markModes() { $('.mode').forEach(function (b) { var on = b.getAttribute('data-mode') === App.mode; b.classList.toggle('sel', on); b.setAttribute('aria-checked', on); }); var n = $('lessons-mode'); if (n) { var m = g.Boards.modes.filter(function (x) { return x.id === App.mode; })[0]; n.textContent = m ? m.icon + ' ' + m.name : '🏃 المغامرة'; } }
     $$('.mode').forEach(function (b) { b.addEventListener('click', function () { App.mode = b.getAttribute('data-mode'); Save.data.mode = App.mode; Save.write(); A.resume(); A.sfx('click'); markModes(); }); });
     markModes(); App.markModes = markModes;
     $('btn-report').addEventListener('click', function () { A.resume(); A.sfx('click'); App.reportBack = App.screen; App.show('report'); });
